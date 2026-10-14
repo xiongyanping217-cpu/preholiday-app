@@ -1,6 +1,7 @@
 import streamlit as st
 from html import escape
-
+import os
+import base64
 st.set_page_config(page_title="幼儿园活动计划", layout="wide")
 
 # Streamlit 页面整体使用楷体
@@ -85,7 +86,15 @@ def make_print_html() -> str:
     safe_no = escape(activity_no)
     safe_skill = escape(skill)
     safe_executivefunction  = escape(executivefunction)
+    
+    # 自动读取同目录下的 pcf.png 并转换为 Base64
+    img_base64 = ""
+    if os.path.exists("pcf.png"):
+        with open("pcf.png", "rb") as f:
+            encoded = base64.b64encode(f.read()).decode()
+            img_base64 = f"data:image/png;base64,{encoded}"
 
+    # 返回完整的 HTML（包含右上角图标、独立格子的班级/主题、以及所有教案内容）
     return f'''<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -107,22 +116,42 @@ def make_print_html() -> str:
     .label {{ width: 30mm; font-weight: bold; white-space: nowrap; }}
     .content {{ min-height: 12mm; overflow-wrap: anywhere; }}
     .footer {{ margin-top: 5mm; font-size: 10pt; }}
+    
+    /* 右上角图标样式 */
+    .top-right-icon {{
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        width: 45px;
+        height: 45px;
+        z-index: 9999;
+    }}
+
     @media screen {{ body {{ max-width: 190mm; margin: 12mm auto; padding: 10mm; border: 1px solid #ccc; }} }}
     @media print {{ body {{ width: auto; margin: 0; padding: 0; border: 0; }} .no-print {{ display: none !important; }} tr, td {{ break-inside: avoid; }} }}
 </style>
 </head>
 <body>
+
+<!-- 右上角图标 -->
+<img src="{img_base64}" alt="Logo" class="top-right-icon">
+
 <div class="no-print" style="text-align:right;margin-bottom:10px;">
   <button onclick="window.print()" style="font-size:12pt;padding:7px 14px;cursor:pointer;">打印／另存为 PDF</button>
 </div>
 <h1>假期活动教案</h1>
-<div class="code">{safe_month}假期活动　｜　活动序号：{safe_no}</div>
+<div class="code">{safe_month}假期活动 ｜ 活动序号：{safe_no}</div>
+
 <table class="meta">
-  <tr><td><b>班级：</b>{safe_class}</td><td><b>活动主题：</b>{safe_category}</td></tr>
+  <tr>
+    <td><b>班级：</b>{safe_class}</td>
+    <td><b>活动主题：</b>{safe_category}</td>
+  </tr>
   <tr><td><b>活动名称：</b>{safe_activity}</td><td><b>活动时间：</b>{safe_duration} 分钟</td></tr>
   <tr><td colspan="2"><b>必要生活技能：</b>{safe_skill}</td></tr>
   <tr><td colspan="2"><b>执行功能：</b>{safe_executivefunction}</td></tr>
 </table>
+
 <div class="section-title">活动目标</div>
 <table class="objectives">{objectives_html}</table>
 <div class="section-title">活动准备</div>
@@ -139,15 +168,33 @@ def make_print_html() -> str:
 <table class="content-table"><tr><td class="content">{text_to_html(safety_text)}</td></tr></table>
 </body>
 </html>'''
-
 st.divider()
 st.subheader("生成打印版")
-st.write("点击下载后，按 Ctrl + P 打印或选择‘另存为 PDF’。打印页面也会优先使用楷体。")
+st.write("点击下载后，按 Ctrl + P 打印或选择‘另存为 PDF’。打印页面将优先使用楷体。")
+
+# 生成教案的 HTML 内容
 html_output = make_print_html()
-st.download_button(
-    label="下载教案（HTML）",
-    data=html_output.encode("utf-8"),
-    file_name=f"{plan_month}假期教案_楷体打印版.html",
-    mime="text/html; charset=utf-8",
-    use_container_width=True,
-)
+
+# 将 HTML 内容转为 Base64 格式，以便通过图片超链接触发下载
+b64_html_content = base64.b64encode(html_output.encode("utf-8")).decode()
+filename = f"{plan_month}假期教案_楷体打印版.html"
+
+# 读取绿色下载按钮图片 (请确保你的图片文件名为 download_icon.png 并且和 py 文件在同目录下)
+btn_img_base64 = ""
+if os.path.exists("download_icon.png"):
+    with open("download_icon.png", "rb") as f:
+        encoded_btn = base64.b64encode(f.read()).decode()
+        btn_img_base64 = f"data:image/png;base64,{encoded_btn}"
+
+# 渲染自定义的图片下载按钮
+if btn_img_base64:
+    download_link_html = f"""
+    <div style="text-align: center; margin: 15px 0;">
+        <a href="data:text/html;charset=utf-8;base64,{b64_html_content}" download="{filename}" title="点击下载教案">
+            <img src="{btn_img_base64}" alt="下载教案" style="width: 140px; height: auto; cursor: pointer; border-radius: 6px; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+        </a>
+    </div>
+    """
+    st.markdown(download_link_html, unsafe_allow_html=True)
+else:
+    st.warning("未找到名为 'download_icon.png' 的下载按钮图片，请确认它与 Python 脚本在同一目录下。")
