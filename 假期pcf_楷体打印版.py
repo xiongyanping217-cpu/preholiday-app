@@ -28,19 +28,19 @@ st.info("字体提示：楷体。若电脑未安装楷体，浏览器可能改�
 # ===== 可修改的基本资料 =====
 col1, col2 = st.columns(2)
 with col1:
-    centre_class = st.selectbox("班级", ["豆豆班", "幼小班", "幼儿班"],width=200)
-    plan_month = st.selectbox("假期教案月份", ["三月", "六月", "九月", "十二月"],width=200)
+    centre_class = st.selectbox("班级", ["请选择","豆豆班", "幼小班", "幼儿班"],width=200)
+    plan_month = st.selectbox("假期教案月份", ["请选择","三月", "六月", "九月", "十二月"],width=200)
     category = st.text_input("活动主题",width=300)
     activity_name = st.text_input("活动名称",width=300)
 with col2:
     duration = st.number_input("活动时间（分钟）", min_value=1, max_value=180, value=30,width=150)
-    activity_no = st.selectbox("活动序号", ["活动1", "活动2", "活动3","活动4","活动5","活动6","活动7","活动8","活动9",
+    activity_no = st.selectbox("活动序号", ["请选择","活动1", "活动2", "活动3","活动4","活动5","活动6","活动7","活动8","活动9",
     "活动10","活动11","活动12","活动13","活动14","活动15","活动16","活动17","活动18","活动19","活动20"],width=150)
     skill = st.selectbox(
         "必要生活技能",
-        ["专注力与自控能力", "换位思考", "沟通能力", "建立联系", "思辨能力", "接受挑战", "自主学习、参与式学习"],width=300
+        ["请选择","专注力与自控能力", "换位思考", "沟通能力", "建立联系", "思辨能力", "接受挑战", "自主学习、参与式学习"],width=300
     )
-    executivefunction = st.selectbox("执行功能",["工作记忆","抑制控制","认知弹性"],width=200)
+    executivefunction = st.selectbox("执行功能",["请选择","工作记忆","抑制控制","认知弹性"],width=200)
 
 st.divider()
 st.subheader("活动目标")
