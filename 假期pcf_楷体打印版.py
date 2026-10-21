@@ -46,7 +46,7 @@ st.divider()
 st.subheader("活动目标")
 objectives_text = st.text_area(
     "幼儿能够（每行填写一个目标）",
-    value="1.    \n2.    \n3.    ",
+    value="   \n    \n    ",
     height=130,width=1200
 )
 
@@ -55,7 +55,7 @@ preparation_text = st.text_area("儿歌／材料／教具", value="", height=120
 
 st.subheader("活动过程")
 intro_text = st.text_area("一、活动导入（5分钟）", value="", height=140)
-presentation_text = st.text_area("二、活动环节（20分钟）", value="", height=190)
+presentation_text = st.text_area("二、活动环节（20分钟）", value="", height=200)
 summary_text = st.text_area("三、活动结束（5分钟）", value="", height=120)
 
 st.subheader("活动拓展")
